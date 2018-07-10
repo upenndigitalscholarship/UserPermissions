@@ -244,14 +244,13 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
         $roleGuest = new Zend_Acl_Role('test');
         $acl->addRole($roleGuest);
         $acl->allow($roleGuest, null, 'view');
-
-
-        $acl->allow('contributor',
+        $acl->allow('guest',
                     'Items',
                     array('edit', 'showNotPublic'),
                     new PermissionsAccessAclAssertion()
                   );
     }
+
 
     /**
      * Display item relations on the public items show page.
