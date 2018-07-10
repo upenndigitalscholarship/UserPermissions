@@ -233,15 +233,24 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
      *
      * @param array $args
      */
-    public function hookDefineAcl($args)
-    {
+    public function hookDefineAcl($args) {
         $acl = $args['acl'];
 
         $indexResource = new Zend_Acl_Resource('ItemRelations_Index');
         $vocabResource = new Zend_Acl_Resource('ItemRelations_Vocabularies');
         $acl->add($indexResource);
         $acl->add($vocabResource);
-        $acl->allow('guest-user')
+
+        $roleGuest = new Zend_Acl_Role('test');
+        $acl->addRole($roleGuest);
+        $acl->allow($roleGuest, null, 'view');
+
+
+        $acl->allow('contributor',
+                    'Items',
+                    array('edit', 'showNotPublic'),
+                    new PermissionsAccessAclAssertion()
+                  );
     }
 
     /**
