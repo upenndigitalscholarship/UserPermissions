@@ -1,14 +1,12 @@
 <?php
 /**
- * Item Relations
- * @copyright Copyright 2010-2014 Roy Rosenzweig Center for History and New Media
- * @license http://www.gnu.org/licenses/gpl-3.0.txt GNU GPLv3
+ * User Permissions
  */
 
 /**
- * Item Relations plugin.
+ * User Permissions plugin.
  */
-class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
+class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
 {
     /**
      * @var array Hooks for the plugin.
@@ -17,10 +15,7 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
         'install',
         'uninstall',
         'upgrade',
-        'config',
-        'config_form',
         'define_acl',
-        'initialize',
         'after_save_item',
         'admin_items_show_sidebar',
         'admin_items_search',
@@ -39,14 +34,6 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
     );
 
     /**
-     * @var array Options and their default values.
-     */
-    protected $_options = array(
-        'item_relations_public_append_to_items_show' => 1,
-        'item_relations_relation_format' => 'prefix_local_part'
-    );
-
-    /**
      * Install the plugin.
      */
     public function hookInstall()
@@ -55,71 +42,13 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
         $db = $this->_db;
 
         $sql = "
-        CREATE TABLE IF NOT EXISTS `$db->ItemRelationsVocabulary` (
+        CREATE TABLE IF NOT EXISTS `$db->UserPermissionsPermissions` (
             `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `name` varchar(100) NOT NULL,
-            `description` text,
-            `namespace_prefix` varchar(100) NOT NULL,
-            `namespace_uri` varchar(200) DEFAULT NULL,
-            `custom` BOOLEAN NOT NULL,
+            `item_id` int(10) unsigned NOT NULL,
+            `user_id` int(10) unsigned NOT NULL,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
         $db->query($sql);
-
-        $sql = "
-        CREATE TABLE IF NOT EXISTS `$db->ItemRelationsProperty` (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `vocabulary_id` int(10) unsigned NOT NULL,
-            `local_part` varchar(100) NOT NULL,
-            `label` varchar(100) DEFAULT NULL,
-            `description` text,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-        $db->query($sql);
-
-        $sql = "
-        CREATE TABLE IF NOT EXISTS `$db->ItemRelationsRelation` (
-            `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-            `subject_item_id` int(10) unsigned NOT NULL,
-            `property_id` int(10) unsigned NOT NULL,
-            `object_item_id` int(10) unsigned NOT NULL,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
-        $db->query($sql);
-
-        // Install the formal vocabularies and their properties.
-        $formalVocabularies = include 'formal_vocabularies.php';
-        foreach ($formalVocabularies as $formalVocabulary) {
-            $vocabulary = new ItemRelationsVocabulary;
-            $vocabulary->name = $formalVocabulary['name'];
-            $vocabulary->description = $formalVocabulary['description'];
-            $vocabulary->namespace_prefix = $formalVocabulary['namespace_prefix'];
-            $vocabulary->namespace_uri = $formalVocabulary['namespace_uri'];
-            $vocabulary->custom = 0;
-            $vocabulary->save();
-
-            $vocabularyId = $vocabulary->id;
-
-            foreach ($formalVocabulary['properties'] as $formalProperty) {
-                $property = new ItemRelationsProperty;
-                $property->vocabulary_id = $vocabularyId;
-                $property->local_part = $formalProperty['local_part'];
-                $property->label = $formalProperty['label'];
-                $property->description = $formalProperty['description'];
-                $property->save();
-            }
-        }
-
-        // Install a custom vocabulary.
-        $customVocabulary = new ItemRelationsVocabulary;
-        $customVocabulary->name = 'Custom';
-        $customVocabulary->description = 'Custom vocabulary containing relations defined for this Omeka instance.';
-        $customVocabulary->namespace_prefix = ''; // cannot be NULL
-        $customVocabulary->namespace_uri = null;
-        $customVocabulary->custom = 1;
-        $customVocabulary->save();
-
-        $this->_installOptions();
     }
 
     /**
@@ -130,40 +59,8 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
         $db = $this->_db;
 
         // Drop the vocabularies table.
-        $sql = "DROP TABLE IF EXISTS `$db->ItemRelationsVocabulary`";
+        $sql = "DROP TABLE IF EXISTS `$db->UserPermissionsPermissions`";
         $db->query($sql);
-
-        // Drop the properties table.
-        $sql = "DROP TABLE IF EXISTS `$db->ItemRelationsProperty`";
-        $db->query($sql);
-
-        // Drop the relations table.
-        $sql = "DROP TABLE IF EXISTS `$db->ItemRelationsRelation`";
-        $db->query($sql);
-
-        $this->_uninstallOptions();
-    }
-
-   /**
-     * Display the plugin configuration form.
-     */
-    public static function hookConfigForm()
-    {
-        $publicAppendToItemsShow = get_option('item_relations_public_append_to_items_show');
-        $relationFormat = get_option('item_relations_relation_format');
-
-        require dirname(__FILE__) . '/config_form.php';
-    }
-
-    /**
-     * Handle the plugin configuration form.
-     */
-    public static function hookConfig()
-    {
-        set_option('item_relations_public_append_to_items_show',
-            (int)(boolean) $_POST['item_relations_public_append_to_items_show']);
-        set_option('item_relations_relation_format',
-            $_POST['item_relations_relation_format']);
     }
 
     /**
@@ -218,14 +115,6 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
                 $db->query($sql);
             }
         }
-    }
-
-   /**
-     * Add the translations.
-     */
-    public function hookInitialize()
-    {
-        add_translation_source(dirname(__FILE__) . '/languages');
     }
 
     /**

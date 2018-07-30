@@ -10,7 +10,7 @@
  *
  * Simply redirects to the VocabularyController.
  */
-class ItemRelations_IndexController extends Omeka_Controller_AbstractActionController
+class UserPermissions_IndexController extends Omeka_Controller_AbstractActionController
 {
     /**
      * Redirect to vocabularies/browse.
