@@ -242,11 +242,11 @@ class ItemRelationsPlugin extends Omeka_Plugin_AbstractPlugin
         $acl->add($vocabResource);
 
         $roleGuest = new Zend_Acl_Role('test');
-        $acl->addRole($roleGuest);
+        $acl->addRole($roleGuest, 'guest');
         $acl->allow($roleGuest, null, 'view');
         $acl->allow('guest',
                     'Items',
-                    array('edit', 'showNotPublic'),
+                    array('view', 'showNotPublic'),
                     new PermissionsAccessAclAssertion()
                   );
     }
