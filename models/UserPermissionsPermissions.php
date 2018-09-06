@@ -4,9 +4,10 @@
  */
 
 /**
- * User Permissions Users model.
+ * UserPermissions Permissions model.
  */
-class UserPermissionsUsers extends Omeka_Record_AbstractRecord {
+class UserPermissionsPermissions extends Omeka_Record_AbstractRecord
+{
     /**
      * @var int
      */
@@ -21,4 +22,5 @@ class UserPermissionsUsers extends Omeka_Record_AbstractRecord {
      * @var int
      */
     public $user_id;
+
 }

@@ -1,42 +1,26 @@
 <p>
 <?php
-$link = '<a href="' . url('item-relations/vocabularies/') . '">'
-      . __('Browse Permissions') . '</a>';
 
-echo __('Here you can give this item specific permissions by assigning access to the person '
-     . 'or persons of your choosing. For descriptions of each permission, see the ' . $link . ' page. '
+echo __('Assign viewing permissions to users with in the Guest role. User can only view this item on the public interface, not through the admin dashboard.'
 );
 ?>
 </p>
 <table>
     <thead>
     <tr>
-        <th><?php echo __('Subject'); ?></th>
-        <th><?php echo __('Relation --> Users Who Can View'); ?></th>
+        <th><?php echo __('Guest User'); ?></th>
         <th><?php echo __('Delete --> ...'); ?></th>
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($subjectRelations as $subjectRelation): ?>
+    <?php foreach ($userPermissions as $permitted_user): ?>
     <tr>
-        <td><?php echo __('This Item'); ?></td>
-        <td><?php echo $subjectRelation['relation_text']; ?></td>
-        <td><a href="<?php echo url('items/show/' . $subjectRelation['object_item_id']); ?>" target="_blank"><?php echo $subjectRelation['object_item_title']; ?></a></td>
+        <td><?php echo $permitted_user['username']; ?></td>
         <td><input type="checkbox" name="item_relations_item_relation_delete[]" value="<?php echo $subjectRelation['item_relation_id']; ?>" /></td>
     </tr>
     <?php endforeach; ?>
-    <?php foreach ($objectRelations as $objectRelation): ?>
-    <tr>
-        <td><a href="<?php echo url('items/show/' . $objectRelation['subject_item_id']); ?>" target="_blank"><?php echo $objectRelation['subject_item_title']; ?></a></td>
-        <td><?php echo $objectRelation['relation_text']; ?></td>
-        <td><?php echo __('This Item'); ?></td>
-        <td><input type="checkbox" name="item_relations_item_relation_delete[]" value="<?php echo $objectRelation['item_relation_id']; ?>" /></td>
-    </tr>
-    <?php endforeach; ?>
     <tr class="item-relations-entry">
-        <td><?php echo __('This Item'); ?></td>
-        <td><?php echo get_view()->formSelect('item_relations_property_id[]', null, array('multiple' => false), $formSelectProperties); ?></td>
-        <td><?php echo __('Item ID'); ?> <?php echo get_view()->formText('item_relations_item_relation_object_item_id[]', null, array('size' => 8)); ?></td>
+        <td><?php echo get_view()->formSelect('user', @$_REQUEST['user'], array('id' => 'user-search'), get_table_options('User')); ?></td>
         <td><span style="color:#ccc;">n/a</span></td>
     </tr>
     </tbody>
