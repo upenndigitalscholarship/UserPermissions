@@ -16,10 +16,10 @@ echo __('Assign viewing permissions to users with in the Guest role. User can on
     <?php foreach ($userPermissions as $permitted_user): ?>
     <tr>
         <td><?php echo $permitted_user['username']; ?></td>
-        <td><input type="checkbox" name="item_relations_item_relation_delete[]" value="<?php echo $subjectRelation['item_relation_id']; ?>" /></td>
+        <td><input type="checkbox" name="user_permissions_permission_delete[]" value="<?php echo $permitted_user['id']; ?>" /></td>
     </tr>
     <?php endforeach; ?>
-    <tr class="item-relations-entry">
+    <tr class="permissions-entry">
         <td><?php echo get_view()->formSelect('user', @$_REQUEST['user'], array('id' => 'user-search'), get_table_options('User')); ?></td>
         <td><span style="color:#ccc;">n/a</span></td>
     </tr>
