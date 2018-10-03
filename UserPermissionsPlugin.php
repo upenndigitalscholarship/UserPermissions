@@ -308,33 +308,32 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
      * @param Item|int $objectItem
      * @return bool True: success; false: unsuccessful
      */
-    public static function insertItemRelation($subjectItem, $propertyId, $objectItem)
+    public static function insertUserRelations($item_id, $user_id)
     {
-        // Only numeric property IDs are valid.
-        if (!is_numeric($propertyId)) {
-            return false;
+        // Only numeric item IDs are valid.
+      //  if (!is_numeric($item_id)) {
+        //    return false;
+        //}
+
+        // Set the item id.
+        if (!($item_id instanceOf Item)) {
+            $item_id = get_db()->getTable('items')->find($item_id);
         }
 
-        // Set the subject item.
-        if (!($subjectItem instanceOf Item)) {
-            $subjectItem = get_db()->getTable('Item')->find($subjectItem);
-        }
-
-        // Set the object item.
-        if (!($objectItem instanceOf Item)) {
-            $objectItem = get_db()->getTable('Item')->find($objectItem);
+        // Set the user id.
+        if (!($user_id instanceOf User)) {
+            $user_id = get_db()->getTable('users')->find($user_id);
         }
 
         // Don't save the relation if the subject or object items don't exist.
-        if (!$subjectItem || !$objectItem) {
+        if (!$item_id || !$user_id) {
             return false;
         }
 
-        $itemRelation = new ItemRelationsRelation;
-        $itemRelation->subject_item_id = $subjectItem->id;
-        $itemRelation->property_id = $propertyId;
-        $itemRelation->object_item_id = $objectItem->id;
-        $itemRelation->save();
+        $userPermission = new ItemRelationsRelation;
+        $userPermission->subject_item_id = $subjectItem->id;
+        $userPermission->object_item_id = $objectItem->id;
+        $userPermission->save();
 
         return true;
     }

@@ -25,11 +25,11 @@ echo __('Assign viewing permissions to users with in the Guest role. User can on
     </tr>
     </tbody>
 </table>
-<button type="button" class="item-relations-add-relation"><?php echo __('Add a Relation'); ?></button>
+<button type="button" class="user-permissions-add-permission"><?php echo __('Add a Permission'); ?></button>
 <script type="text/javascript">
 jQuery(document).ready(function () {
-    jQuery('.item-relations-add-relation').click(function () {
-        var oldRow = jQuery('.item-relations-entry').last();
+    jQuery('.user-permissions-add-permission').click(function () {
+        var oldRow = jQuery('.user-permissions-entry').last();
         var newRow = oldRow.clone();
         oldRow.after(newRow);
         var inputs = newRow.find('input, select');
