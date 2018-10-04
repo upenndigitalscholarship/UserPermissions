@@ -133,25 +133,24 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
         $db = $this->_db;
 
         // Save item relations.
-        if (isset($post['item_relations_property_id'])) {
-            foreach ($post['item_relations_property_id'] as $key => $propertyId) {
-                self::insertItemRelation(
-                    $record,
-                    $propertyId,
-                    $post['item_relations_item_relation_object_item_id'][$key]
+        if (isset($post['user'])) {
+            foreach ($post['user'] as $key => $user_id) {
+                self::insertUserPermissions(
+                    $user_id,
+                    $record
                 );
             }
         }
 
         // Delete item relations.
-        if (isset($post['item_relations_item_relation_delete'])) {
-            foreach ($post['item_relations_item_relation_delete'] as $itemRelationId) {
-                $itemRelation = $db->getTable('ItemRelationsRelation')->find($itemRelationId);
+        if (isset($post['item_relations_relation_delete'])) {
+            foreach ($post['item_relations_relation_delete'] as $userPermissionsId) {
+                $userPermissions = $db->getTable('ItemRelationsRelation')->find($userPermissionsId);
                 // When an item is related to itself, deleting both relations
                 // simultaneously will result in an error. Prevent this by
                 // checking if the item relation exists prior to deletion.
-                if ($itemRelation) {
-                    $itemRelation->delete();
+                if ($userPermissions) {
+                    $userPermissions->delete();
                 }
             }
         }
@@ -233,7 +232,7 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
         $item = $args['item'];
         $custom = $args['custom'];
 
-        self::insertItemRelation(
+        self::insertUserPermissions(
             $item,
             $custom['item_relations_property_id'],
             $custom['item_relations_item_relation_object_item_id']
@@ -308,7 +307,7 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
      * @param Item|int $objectItem
      * @return bool True: success; false: unsuccessful
      */
-    public static function insertUserRelations($item_id, $user_id)
+    public static function insertUserPermissions($user, $item)
     {
         // Only numeric item IDs are valid.
       //  if (!is_numeric($item_id)) {
@@ -316,23 +315,23 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
         //}
 
         // Set the item id.
-        if (!($item_id instanceOf Item)) {
-            $item_id = get_db()->getTable('items')->find($item_id);
+        if (!($item instanceOf Item)) {
+            $item = get_db()->getTable('items')->find($item);
         }
 
         // Set the user id.
-        if (!($user_id instanceOf User)) {
-            $user_id = get_db()->getTable('users')->find($user_id);
+        if (!($user instanceOf User)) {
+            $user = get_db()->getTable('user')->find($user);
         }
 
         // Don't save the relation if the subject or object items don't exist.
-        if (!$item_id || !$user_id) {
+        if (!$item || !$user) {
             return false;
         }
 
-        $userPermission = new ItemRelationsRelation;
-        $userPermission->subject_item_id = $subjectItem->id;
-        $userPermission->object_item_id = $objectItem->id;
+        $userPermission = new UserPermissionsPermissions;
+        $userPermission->user_id = $user->id;
+        $userPermission->item_id = $item->id;
         $userPermission->save();
 
         return true;

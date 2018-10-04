@@ -3,6 +3,10 @@
 
 echo __('Assign viewing permissions to users with in the Guest role. User can only view this item on the public interface, not through the admin dashboard.'
 );
+
+echo __('hello');
+_log("test");
+
 ?>
 </p>
 <table>
@@ -20,7 +24,7 @@ echo __('Assign viewing permissions to users with in the Guest role. User can on
     </tr>
     <?php endforeach; ?>
     <tr class="permissions-entry">
-        <td><?php echo get_view()->formSelect('user', @$_REQUEST['user'], array('id' => 'user-search'), get_table_options('User')); ?></td>
+        <td><?php echo get_view()->formSelect('user[]', @$_REQUEST['user'], array('id' => 'user-search'), get_table_options('User')); ?></td>
         <td><span style="color:#ccc;">n/a</span></td>
     </tr>
     </tbody>
