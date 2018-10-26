@@ -4,9 +4,6 @@
 echo __('Assign viewing permissions to users with in the Guest role. User can only view this item on the public interface, not through the admin dashboard.'
 );
 
-echo __('hello');
-_log("test");
-
 ?>
 </p>
 <table>

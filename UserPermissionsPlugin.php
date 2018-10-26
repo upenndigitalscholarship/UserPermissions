@@ -59,7 +59,10 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
         // Drop the vocabularies table.
         $sql = "DROP TABLE IF EXISTS `$db->UserPermissionsPermissions`";
         $db->query($sql);
+
+        $this->_uninstallOptions();
     }
+
 
     /**
      * Define the ACL.
@@ -68,14 +71,16 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookDefineAcl($args) {
         $acl = $args['acl'];
-
         $acl->allow('guest',
                     'Items',
-                    array('view', 'showNotPublic'),
-                    new PermissionsAccessAclAssertion()
-                  );
+                    array('view','showNotPublic'),
+                    new PermissionsAccessAclAssertion());
     }
 
+
+    //if ($acl->isAllowed($user, $resource, $privilege)) {
+      // display item on page
+    //}
 
     /**
      * Display item relations on the public items show page.
@@ -92,7 +97,7 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
     }
 
     /**
-     * Display item relations on the admin items show page.
+     * Display user permissions on the admin items show page.
      *
      * @param Item $item
      */
@@ -250,9 +255,10 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
 
         $formSelectProperties = get_table_options('UserPermissionsPermissions');
         $userPermissions = self::prepareUserPermissions($item);
+        $guest_users = self::prepareGuestUsers($item);
 
         ob_start();
-        include 'item_relations_form.php';
+        include 'user_permissions_form.php';
         $content = ob_get_contents();
         ob_end_clean();
 
@@ -268,20 +274,50 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public static function prepareUserPermissions(Item $item)
     {
-        $permissions = get_db()->getTable('UserPermissionsPermissions');
+        $permissions = get_db()->getTable('UserPermissionsPermissions')->findByItemId($item->id);
         $permitted_users = array();
-
         foreach ($permissions as $permission) {
-            if (!(findActiveById($user_id))) {
+          $user = get_db()->getTable('User')->findActiveById($permission->user_id);
+            if (!$user) {
                 continue;
             }
             $permitted_users[] = array(
                 'permission_id' => $permission->id,
                 'user_id' => $permission->user_id,
-                'username' => findActiveById($user_id)->$name,
+                'username' => $user->name,
             );
+            _log($permission->id . $permission->user_id . $user->name, $priority = Zend_Log::ERR);
         }
         return $permitted_users;
+    }
+
+    /**
+     * Prepare list of unassigned guest users for display.
+     *
+     * @param Item $item
+     * @return array
+     */
+    public static function prepareGuestUsers(Item $item)
+    {
+        $permissions = get_db()->getTable('UserPermissionsPermissions')->findByItemId($item->id);
+        $guest_users = get_table_options('User');
+        $permitted_users = array();
+        foreach ($permissions as $permission) {
+          $user = get_db()->getTable('User')->findActiveById($permission->user_id);
+            if (!$user) {
+                continue;
+            }
+            if (in_array($user, $guest_users)) {
+                break;
+            }
+            $permitted_users[] = array(
+                'permission_id' => $permission->id,
+                'user_id' => $permission->user_id,
+                'username' => $user->name,
+            );
+            _log($permission->id . $permission->user_id . $user->name, $priority = Zend_Log::ERR);
+        }
+        return $guest_users;
     }
 
     /**

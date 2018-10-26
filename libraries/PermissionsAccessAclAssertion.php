@@ -13,18 +13,20 @@ class PermissionsAccessAclAssertion implements Zend_Acl_Assert_Interface {
         // for this privilege, the exhibit object isn't passed in
         // so I can't check on that
         // whomp whomp
-        if ($privilege == 'showNotPublic') {
-            return true;
-        }
+        //if ($privilege == 'showNotPublic') {
+          //  return true;
+        //}
 
-        if (($role instanceof User) && get_class($resource) == 'Exhibit') {
-            if ($privilege == 'edit') {
+        if (($role instanceof User) && get_class($resource) == 'Items') {
+          _log($id, $priority = Zend_Log::ERR);
+            if ($privilege == 'view') {
                 $db = get_db();
-                $accessTable = $db->getTable('Items');
-                $accessRecords = $accessTable->findBy(array('user_role' => $role->id,
+                $accessTable = $db->getTable('UserPermissionsPermsissions');
+                $accessRecords = $accessTable->findBy(array('user_id' => $role->id,
                                                             'item_id' => $resource->id, ));
 
                 return !empty($accessRecords);
+                _log($id, $priority = Zend_Log::ERR);
             }
         }
 
