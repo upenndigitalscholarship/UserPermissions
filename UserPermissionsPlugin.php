@@ -286,7 +286,6 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
                 'user_id' => $permission->user_id,
                 'username' => $user->name,
             );
-            _log($permission->id . $permission->user_id . $user->name, $priority = Zend_Log::ERR);
         }
         return $permitted_users;
     }
@@ -315,7 +314,6 @@ class UserPermissionsPlugin extends Omeka_Plugin_AbstractPlugin
                 'user_id' => $permission->user_id,
                 'username' => $user->name,
             );
-            _log($permission->id . $permission->user_id . $user->name, $priority = Zend_Log::ERR);
         }
         return $guest_users;
     }
