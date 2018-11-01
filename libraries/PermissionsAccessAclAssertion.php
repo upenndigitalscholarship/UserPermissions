@@ -8,16 +8,10 @@ class PermissionsAccessAclAssertion implements Zend_Acl_Assert_Interface {
         $privilege = null)
     {
 
-        // it looks like without this always being true,
-        // the second check doesn't get made
-        // for this privilege, the exhibit object isn't passed in
-        // so I can't check on that
-        // whomp whomp
         if ($privilege == 'showNotPublic') {
 //            return true;
-            _log("privcheck2 : ".get_class($resource), $priority = Zend_Log::ERR);
-            if (($role instanceof User) && get_class($resource) == 'Items') {
-              _log("got inside acl if check: ".$role, $priority = Zend_Log::ERR);
+            if (($role instanceof User) && $resource->getResourceId() == 'Items') {
+              _log("got inside acl if check: ".var_dump($resource), $priority = Zend_Log::ERR);
                 if ($privilege == 'view') {
                     $db = get_db();
                     $accessTable = $db->getTable('UserPermissionsPermsissions');
